@@ -1,12 +1,10 @@
 package com.jpmorgan.chase.service;
 
-import com.jpmorgan.chase.ContractService;
-import com.jpmorgan.chase.TradeAssignmentServiceImpl;
-import com.jpmorgan.chase.TradeContractProcessorImpl;
-import com.jpmorgan.chase.TradeService;
 import com.jpmorgan.chase.model.Contract;
 import com.jpmorgan.chase.model.Trade;
 import com.jpmorgan.chase.model.TradeAssignmentResponse;
+import com.jpmorgan.chase.repository.ContractRepository;
+import com.jpmorgan.chase.repository.TradeRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +29,10 @@ class TradeAssignmentServiceImplTest {
     private TradeContractProcessorImpl tradeContractProcessor;
 
     @MockBean
-    private TradeService tradeService;
+    private TradeRepository tradeRepository;
 
     @MockBean
-    private ContractService contractService;
+    private ContractRepository contractRepository;
     @Test
     public void test_assign() {
         Trade firstTrade = new Trade(1L, 100d, Timestamp.valueOf(LocalDateTime.now().plusMinutes(20)));

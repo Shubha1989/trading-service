@@ -3,8 +3,8 @@ package com.jpmorgan.chase.controller;
 import com.jpmorgan.chase.model.Trade;
 import com.jpmorgan.chase.model.TradeAssignmentRequest;
 import com.jpmorgan.chase.model.TradeAssignmentResponse;
-import com.jpmorgan.chase.AssignmentService;
-import com.jpmorgan.chase.TradeService;
+import com.jpmorgan.chase.repository.TradeRepository;
+import com.jpmorgan.chase.service.AssignmentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -18,25 +18,25 @@ public class TradeAssignmentController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TradeAssignmentController.class);
 
-    private final TradeService tradeService;
+    private final TradeRepository tradeRepository;
     private final AssignmentService assignmentService;
 
-    public TradeAssignmentController(TradeService tradeService,
+    public TradeAssignmentController(TradeRepository tradeRepository,
                                      AssignmentService assignmentService) {
-        this.tradeService = tradeService;
+        this.tradeRepository = tradeRepository;
         this.assignmentService = assignmentService;
     }
 
     @GetMapping(value = "trades")
     public List<Trade> getAllTrades() {
         LOGGER.info("Fetching all trades");
-        return tradeService.fetchAllTrades();
+        return (List<Trade>) tradeRepository.findAll();
     }
 
     @GetMapping(value = "trade/{id}")
     public Optional<Trade> getTrade(@PathVariable Long id) {
         LOGGER.info("Fetching trade for tradeId = {}", id);
-        return tradeService.fetchTradeById(id);
+        return tradeRepository.findById(id);
     }
 
     @PostMapping(value = "trades/contract-assignment")

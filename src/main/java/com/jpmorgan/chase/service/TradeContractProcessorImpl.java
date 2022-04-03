@@ -1,7 +1,9 @@
-package com.jpmorgan.chase;
+package com.jpmorgan.chase.service;
 
 import com.jpmorgan.chase.model.Contract;
 import com.jpmorgan.chase.model.Trade;
+import com.jpmorgan.chase.repository.ContractRepository;
+import com.jpmorgan.chase.repository.TradeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
@@ -22,14 +24,16 @@ public class TradeContractProcessorImpl implements TradeContractProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TradeContractProcessorImpl.class);
 
-    private final TradeService tradeService;
-    private final ContractService contractService;
+    private final TradeRepository tradeRepository;
+    private final ContractRepository contractRepository;
 
-    public TradeContractProcessorImpl(TradeService tradeService, ContractService contractService) {
-        this.tradeService = tradeService;
-        this.contractService = contractService;
+    public TradeContractProcessorImpl(TradeRepository tradeRepository,
+                                      ContractRepository contractRepository) {
+        this.tradeRepository = tradeRepository;
+        this.contractRepository = contractRepository;
     }
 
+    @Override
     public Map<Trade, Contract> assignTradesToContracts(Set<Trade> trades, Set<Contract> contracts, long hours) {
         LOGGER.info("Filtering trades within the given input time");
         Set<Trade> validTrades =  trades.stream()
@@ -48,10 +52,6 @@ public class TradeContractProcessorImpl implements TradeContractProcessor {
         return assignedTrades;
     }
 
-    private String getTradeIds(Set<Trade> validTrades) {
-        return validTrades.stream().map(trade -> String.valueOf(trade.getTradeId())).collect(Collectors.joining(","));
-    }
-
     @Override
     @Transactional
     public void persistTradeAndContracts(Map<Trade, Contract> assignedTrade) {
@@ -59,14 +59,18 @@ public class TradeContractProcessorImpl implements TradeContractProcessor {
             LOGGER.info("Started persisting contracts and trades");
             Set<Contract> contracts = new HashSet<>(assignedTrade.values());
             Set<Trade> trades = assignedTrade.keySet();
-            contractService.persistContracts(contracts);
-            tradeService.persistTrades(trades);
+            contractRepository.saveAll(contracts);
+            tradeRepository.saveAll(trades);
 
         } catch (Exception exception) {
             LOGGER.error("Failed while persisting Trades and Contracts");
             throw exception;
         }
     }
+    private String getTradeIds(Set<Trade> validTrades) {
+        return validTrades.stream().map(trade -> String.valueOf(trade.getTradeId())).collect(Collectors.joining(","));
+    }
+
 
     private Optional<Pair<Trade, Contract>> assignTradeToContract(Set<Contract> contracts, Set<Long> assignedContracts, Trade trade) {
         try {

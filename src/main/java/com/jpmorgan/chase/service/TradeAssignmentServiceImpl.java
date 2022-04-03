@@ -1,4 +1,4 @@
-package com.jpmorgan.chase;
+package com.jpmorgan.chase.service;
 
 import com.jpmorgan.chase.model.Contract;
 import com.jpmorgan.chase.model.Trade;

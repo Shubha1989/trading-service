@@ -2,30 +2,37 @@ package com.jpmorgan.chase.service;
 
 import com.jpmorgan.chase.model.Contract;
 import com.jpmorgan.chase.model.Trade;
+import com.jpmorgan.chase.repository.ContractRepository;
+import com.jpmorgan.chase.repository.TradeRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = TradeAssignmentOrchestrator.class)
-class TradeAssignmentOrchestratorTest {
-
+@ContextConfiguration(classes = TradeContractProcessorImpl.class)
+class TradeContractProcessorImplTest {
 
     @Autowired
-    private TradeAssignmentOrchestrator tradeAssignmentOrchestrator;
+    private TradeContractProcessor tradeContractProcessor;
+
+    @MockBean
+    private TradeRepository tradeRepository;
+
+    @MockBean
+    private ContractRepository contractRepository;
 
     @Test
-    public void test1() {
+    public void testAssignTradesToContracts() {
         Trade firstTrade = new Trade(1L, 100d, Timestamp.valueOf(LocalDateTime.now().plusMinutes(20)));
         Trade secondTrade = new Trade(2L, 200d, Timestamp.valueOf(LocalDateTime.now().plusMinutes(30)));
         Trade thirdTrade = new Trade(3L, 300d, Timestamp.valueOf(LocalDateTime.now().plusMinutes(40)));
@@ -37,17 +44,15 @@ class TradeAssignmentOrchestratorTest {
         Set<Trade> tradeList = Set.of(firstTrade, secondTrade, thirdTrade);
         Set<Contract> contractList = Set.of(firstContract, secondContract, thirdContract);
 
-        tradeAssignmentOrchestrator.tradeAssignment( tradeList, contractList,2L);
+        tradeContractProcessor.assignTradesToContracts( tradeList, contractList,2L);
 
-        tradeList.stream().forEach(System.out::println);
-        contractList.stream().forEach(System.out::println);
-//        assertTrue(tradeList.stream().allMatch(trade -> !Objects.isNull(trade.getContract().getContractId())));
-//        assertTrue(contractList.stream().allMatch(contract -> !Objects.isNull(contract.getTrade().getTradeId())));
+        assertTrue(tradeList.stream().noneMatch(trade -> Objects.isNull(trade.getContract())));
+        assertTrue(contractList.stream().noneMatch(contract -> Objects.isNull(contract.getTrade().getTradeId())));
 
     }
 
     @Test
-    public void test2() {
+    public void testAssignTradesToContractsWithTradesGreaterThanContracts() {
         Trade firstTrade = new Trade(1L, 100d, Timestamp.valueOf(LocalDateTime.now().plusMinutes(20)));
         Trade secondTrade = new Trade(2L, 200d, Timestamp.valueOf(LocalDateTime.now().plusMinutes(30)));
         Trade thirdTrade = new Trade(3L, 300d, Timestamp.valueOf(LocalDateTime.now().plusMinutes(40)));
@@ -61,18 +66,16 @@ class TradeAssignmentOrchestratorTest {
         Set<Trade> tradeList= Set.of(firstTrade,secondTrade,thirdTrade,fourthTrade,fifthTrade);
         Set<Contract> contractList= Set.of(firstContract,secondContract,thirdContract);
 
-        tradeAssignmentOrchestrator.tradeAssignment(tradeList,contractList,2L);
+        tradeContractProcessor.assignTradesToContracts(tradeList,contractList,2L);
 
-        tradeList.stream().forEach(System.out::println);
-        contractList.stream().forEach(System.out::println);
-        /*assertTrue(tradeList.stream().allMatch(trade -> !Objects.isNull(trade.getContract().getContractId())));
-        assertTrue(contractList.stream().allMatch(contract -> !Objects.isNull(contract.getTrade().getTradeId())));*/
+        assertTrue(tradeList.stream().anyMatch(trade -> Objects.isNull(trade.getContract())));
+        assertTrue(contractList.stream().noneMatch(contract -> Objects.isNull(contract.getTrade().getTradeId())));
 
 
     }
 
     @Test
-    public void test3() {
+    public void testAssignTradesToContractsWithTradesLesserThanContracts() {
         Trade firstTrade = new Trade(1L, 100d, Timestamp.valueOf(LocalDateTime.now().plusMinutes(20)));
         Trade secondTrade = new Trade(2L, 200d, Timestamp.valueOf(LocalDateTime.now().plusMinutes(30)));
         Trade thirdTrade = new Trade(3L, 300d, Timestamp.valueOf(LocalDateTime.now().plusMinutes(40)));
@@ -86,12 +89,10 @@ class TradeAssignmentOrchestratorTest {
         Set<Trade> tradeList= Set.of(firstTrade,secondTrade,thirdTrade);
         Set<Contract> contractList= Set.of(firstContract,secondContract,thirdContract,fourthContract,fifthContract);
 
-        tradeAssignmentOrchestrator.tradeAssignment(tradeList,contractList,2L);
+        tradeContractProcessor.assignTradesToContracts(tradeList,contractList,2L);
 
-        tradeList.stream().forEach(System.out::println);
-        contractList.stream().forEach(System.out::println);
-//        assertTrue(tradeList.stream().allMatch(trade -> !Objects.isNull(trade.getContract().getContractId())));
-//        assertTrue(contractList.stream().allMatch(contract -> !Objects.isNull(contract.getTrade().getTradeId())));
+        assertTrue(tradeList.stream().noneMatch(trade -> Objects.isNull(trade.getContract().getContractId())));
+        assertTrue(contractList.stream().anyMatch(contract -> Objects.isNull(contract.getTrade())));
 
 
     }

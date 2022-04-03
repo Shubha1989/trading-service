@@ -1,7 +1,7 @@
 package com.jpmorgan.chase.controller;
 
 import com.jpmorgan.chase.model.Contract;
-import com.jpmorgan.chase.ContractService;
+import com.jpmorgan.chase.repository.ContractRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,22 +16,22 @@ public class ContractController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ContractController.class);
 
-    private final ContractService contractService;
+    private final ContractRepository contractRepository;
 
-    public ContractController(ContractService contractService) {
-        this.contractService = contractService;
+    public ContractController(ContractRepository contractRepository) {
+        this.contractRepository = contractRepository;
     }
 
     @GetMapping(value = "contracts")
     public List<Contract> getAllContracts() {
         LOGGER.info("Fetching all contracts");
-        return contractService.fetchAllContracts();
+        return (List<Contract>) contractRepository.findAll();
     }
 
     @GetMapping(value = "contract/{id}")
     public Optional<Contract> getContract(@PathVariable Long id) {
         LOGGER.info("Fetching contract for contractId = {}", id);
-        return contractService.fetchContractById(id);
+        return contractRepository.findById(id);
     }
 
 }
