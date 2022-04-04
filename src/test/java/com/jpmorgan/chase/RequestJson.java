@@ -8,7 +8,6 @@ import com.jpmorgan.chase.model.TradeAssignmentRequest;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 public class RequestJson {

@@ -7,7 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,13 +36,19 @@ public class TradeAssignmentServiceImpl implements  AssignmentService{
         }
     }
 
-    private TradeAssignmentResponse generateResponse(Map<Trade, Contract> assignedTrade) {
-        Map<Long,Long> validTradesAndContracts = assignedTrade.entrySet().stream()
+    private TradeAssignmentResponse generateResponse(Map<Trade, Contract> assignedTrades) {
+        Map<Long,Long> validTradesAndContracts = assignedTrades.entrySet().stream()
                                                 .collect(Collectors.toMap(e-> e.getKey().getTradeId()
                                                                                  ,e-> e.getValue().getContractId()));
         TradeAssignmentResponse tradeAssignmentResponse = new TradeAssignmentResponse();
         tradeAssignmentResponse.setAssignedTradesInfo(validTradesAndContracts);
+        logAssignedContractAndTrades(validTradesAndContracts);
         return tradeAssignmentResponse;
+    }
+
+    private void logAssignedContractAndTrades(Map<Long, Long> validTradesAndContracts) {
+        LOGGER.info("Trade-Contract assignment completed successfully");
+        validTradesAndContracts.forEach((key, value) -> LOGGER.info("Contract {} is assigned to Trade {}", value, key));
     }
 
 }

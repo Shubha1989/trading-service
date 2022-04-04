@@ -1,8 +1,9 @@
 package com.jpmorgan.chase.model;
 
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.Map;
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TradeAssignmentResponse {
     private Map<Long,Long> assignedTradesInfo;
     private String criticalError;

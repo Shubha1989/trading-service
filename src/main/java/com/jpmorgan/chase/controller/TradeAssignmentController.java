@@ -40,7 +40,7 @@ public class TradeAssignmentController {
     }
 
     @PostMapping(value = "trades/contract-assignment")
-    public ResponseEntity<TradeAssignmentResponse> assignContractsToTrades(@RequestBody TradeAssignmentRequest tradeAssignmentRequest) throws Exception {
+    public ResponseEntity<TradeAssignmentResponse> assignContractsToTrades(@RequestBody TradeAssignmentRequest tradeAssignmentRequest)  {
         LOGGER.info("Initiated contracts to Trades assignment");
         TradeAssignmentResponse tradeAssignmentResponse = assignmentService.assign(tradeAssignmentRequest.getTrades(),
                 tradeAssignmentRequest.getContracts(), tradeAssignmentRequest.getTradingTime());

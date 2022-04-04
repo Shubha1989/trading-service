@@ -35,7 +35,7 @@ public class TradeContractProcessorImpl implements TradeContractProcessor {
 
     @Override
     public Map<Trade, Contract> assignTradesToContracts(Set<Trade> trades, Set<Contract> contracts, long hours) {
-        LOGGER.info("Filtering trades within the given input time");
+        LOGGER.info("Filtering trades within the trading window");
         Set<Trade> validTrades =  trades.stream()
                 .filter(trade -> checkTimestamp.test(trade.getAssignmentSla(),hours))
                 .collect(Collectors.toSet());
@@ -74,14 +74,13 @@ public class TradeContractProcessorImpl implements TradeContractProcessor {
 
     private Optional<Pair<Trade, Contract>> assignTradeToContract(Set<Contract> contracts, Set<Long> assignedContracts, Trade trade) {
         try {
-            LOGGER.info("Assigning Contract to a Trade : {} " , trade.getTradeId());
             Contract validContractToAssign = contracts.stream()
                                                     .filter(contract -> !assignedContracts.contains(contract.getContractId()))
                                                     .findAny().orElseThrow(()-> new RuntimeException("No contracts found to attach"));
-            LOGGER.info("Contract to be assigned :" + validContractToAssign.getContractId());
             validContractToAssign.setTrade(trade);
             trade.setContract(validContractToAssign);
             assignedContracts.add(validContractToAssign.getContractId());
+            LOGGER.debug("Assigning Contract with contractId : {} to a Trade with tradeId : {} " ,validContractToAssign.getContractId(), trade.getTradeId());
             return Optional.of(Pair.of(trade, validContractToAssign));
         } catch (RuntimeException e) {
             LOGGER.error("Unable to find a contract to assign a trade with tradeId = {} ", trade.getTradeId());
