@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-public class RequestJson {
+public class TestUtils {
 
     public static String getRequestJson() throws JsonProcessingException {
 

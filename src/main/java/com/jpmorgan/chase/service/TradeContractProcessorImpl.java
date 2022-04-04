@@ -83,7 +83,7 @@ public class TradeContractProcessorImpl implements TradeContractProcessor {
             LOGGER.debug("Assigning Contract with contractId : {} to a Trade with tradeId : {} " ,validContractToAssign.getContractId(), trade.getTradeId());
             return Optional.of(Pair.of(trade, validContractToAssign));
         } catch (RuntimeException e) {
-            LOGGER.error("Unable to find a contract to assign a trade with tradeId = {} ", trade.getTradeId());
+            LOGGER.warn("Unable to find a contract to assign a trade with tradeId = {} ", trade.getTradeId());
             return Optional.empty();
         }
 

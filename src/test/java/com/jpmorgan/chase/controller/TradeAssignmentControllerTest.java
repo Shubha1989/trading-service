@@ -1,8 +1,7 @@
 package com.jpmorgan.chase.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jpmorgan.chase.RequestJson;
-import com.jpmorgan.chase.model.Trade;
+import com.jpmorgan.chase.TestUtils;
 import com.jpmorgan.chase.model.TradeAssignmentResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,13 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -35,7 +29,7 @@ public class TradeAssignmentControllerTest {
     public void testAssignTradeAndContract() throws Exception {
         MvcResult mvcResult = mockMvc.perform(post("/trades/contract-assignment")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(RequestJson.getRequestJson()))
+                        .content(TestUtils.getRequestJson()))
                 .andExpect(status().isOk())
                 .andReturn();
         TradeAssignmentResponse tradeAssignmentResponse = new ObjectMapper().readValue(mvcResult.getResponse().getContentAsString(), TradeAssignmentResponse.class);
